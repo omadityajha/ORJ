@@ -1,6 +1,15 @@
-import { Outlet, Link } from 'react-router-dom'
+import { Outlet, Link, useNavigate } from 'react-router-dom';
+import { useUser } from '../context/UserContext';
 
 const MainLayout = () => {
+  const { logout, user } = useUser();
+  const navigate = useNavigate();
+
+  const handleLogout = () => {
+    logout();
+    navigate('/login');
+  };
+
   return (
     <div className="min-h-screen flex flex-col">
       <header className="bg-white shadow-sm">
@@ -16,9 +25,12 @@ const MainLayout = () => {
               <Link to="/room" className="text-gray-700 hover:text-primary-600 px-3 py-2 rounded-md text-sm font-medium">
                 Room
               </Link>
-              <Link to="/login" className="text-gray-700 hover:text-primary-600 px-3 py-2 rounded-md text-sm font-medium">
+              <button 
+                onClick={handleLogout}
+                className="text-gray-700 hover:text-primary-600 px-3 py-2 rounded-md text-sm font-medium"
+              >
                 Logout
-              </Link>
+              </button>
             </nav>
           </div>
         </div>
@@ -26,6 +38,11 @@ const MainLayout = () => {
       
       <main className="flex-grow">
         <div className="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
+          {user && (
+            <div className="mb-4 text-sm text-gray-600">
+              Logged in as: {user.email}
+            </div>
+          )}
           <Outlet />
         </div>
       </main>
@@ -38,7 +55,7 @@ const MainLayout = () => {
         </div>
       </footer>
     </div>
-  )
-}
+  );
+};
 
-export default MainLayout
+export default MainLayout;
