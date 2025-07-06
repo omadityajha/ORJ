@@ -1,140 +1,69 @@
-# ORJ - Real-Time Collaborative Web App
+# React + TypeScript + Vite
 
-A powerful real-time collaborative web application built with **React**, **TypeScript**, and **TailwindCSS**. ORJ enables multiple users to work together simultaneously with features like real-time editing, canvas drawing, and live previews — all inside dedicated project rooms.
+This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
 
----
+Currently, two official plugins are available:
 
-## ✨ Features
+- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) for Fast Refresh
+- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
 
-- 🔄 **Real-Time Editing**  
-  Collaborate with team members with instant updates
+## Expanding the ESLint configuration
 
-- 🎨 **Shared Canvas**  
-  Draw, sketch, and visualize ideas together on a canvas
+If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
 
-- 👁️ **Live Preview**  
-  Instantly see changes made by any team member
+```js
+export default tseslint.config([
+  globalIgnores(['dist']),
+  {
+    files: ['**/*.{ts,tsx}'],
+    extends: [
+      // Other configs...
 
-- 🏠 **Room System**  
-  Create and join rooms to organize work by project or team
+      // Remove tseslint.configs.recommended and replace with this
+      ...tseslint.configs.recommendedTypeChecked,
+      // Alternatively, use this for stricter rules
+      ...tseslint.configs.strictTypeChecked,
+      // Optionally, add this for stylistic rules
+      ...tseslint.configs.stylisticTypeChecked,
 
-- 🔒 **User Authentication**  
-  Secure login system to protect your data and sessions
-
-- 📱 **Responsive Design**  
-  Fully optimized for desktop and mobile devices
-
----
-
-## 🛠️ Tech Stack
-
-- ⚛️ [React](https://reactjs.org/)  
-- 🟦 [TypeScript](https://www.typescriptlang.org/)  
-- ⚡ [Vite](https://vitejs.dev/)  
-- 🎨 [TailwindCSS](https://tailwindcss.com/)  
-- 🧭 [React Router](https://reactrouter.com/)  
-- 🧠 Context API & Custom Hooks
-
----
-
-## 📁 Folder Structure
-
-```
-src/
-├── assets/         # Static assets (images, fonts, etc.)
-├── components/     # Reusable UI components
-├── context/        # React context for global state
-├── hooks/          # Custom React hooks
-├── layouts/        # Layout components (e.g., MainLayout)
-├── pages/          # Route pages
-│   ├── Dashboard/  # Dashboard view
-│   ├── Login/      # Authentication page
-│   └── Room/       # Collaborative workspace
-├── routes/         # App routing configuration
-├── styles/         # Tailwind customizations and global styles
-├── App.tsx         # Root component
-└── main.tsx        # App entry point
+      // Other configs...
+    ],
+    languageOptions: {
+      parserOptions: {
+        project: ['./tsconfig.node.json', './tsconfig.app.json'],
+        tsconfigRootDir: import.meta.dirname,
+      },
+      // other options...
+    },
+  },
+])
 ```
 
----
+You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
 
-## 🚀 Setup Instructions
+```js
+// eslint.config.js
+import reactX from 'eslint-plugin-react-x'
+import reactDom from 'eslint-plugin-react-dom'
 
-### ✅ Prerequisites
-
-- [Node.js](https://nodejs.org/) `v18+`
-- [npm](https://www.npmjs.com/) `v9+`
-
----
-
-### 📦 Installation
-
-1. **Clone the repository**
-   ```bash
-   git clone https://github.com/yourusername/orj.git
-   cd orj
-   ```
-
-2. **Install dependencies**
-   ```bash
-   npm install
-   ```
-
-3. **Start the development server**
-   ```bash
-   npm run dev
-   ```
-
-4. **Open your browser**  
-   Visit [http://localhost:5173](http://localhost:5173)
-
----
-
-### 📦 Building for Production
-
-```bash
-npm run build
+export default tseslint.config([
+  globalIgnores(['dist']),
+  {
+    files: ['**/*.{ts,tsx}'],
+    extends: [
+      // Other configs...
+      // Enable lint rules for React
+      reactX.configs['recommended-typescript'],
+      // Enable lint rules for React DOM
+      reactDom.configs.recommended,
+    ],
+    languageOptions: {
+      parserOptions: {
+        project: ['./tsconfig.node.json', './tsconfig.app.json'],
+        tsconfigRootDir: import.meta.dirname,
+      },
+      // other options...
+    },
+  },
+])
 ```
-
-The output will be in the `dist/` folder.
-
----
-
-## 🤝 Contribution Guidelines
-
-We welcome contributions from all collaborators! Please follow these steps:
-
-1. **Create a feature branch**
-   ```bash
-   git checkout -b feature/your-feature-name
-   ```
-
-2. **Make your changes**
-   - Use TypeScript for type safety
-   - Follow consistent formatting (based on Prettier & ESLint)
-   - Write meaningful commit messages
-
-3. **Lint your code**
-   ```bash
-   npm run lint
-   ```
-
-4. **Submit a pull request**
-   - Provide a clear summary of your changes
-   - Link any related issues or discussions
-   - Be open to code review feedback!
-
----
-
-
-## 🙏 Acknowledgements
-
-- [React](https://reactjs.org/)
-- [TypeScript](https://www.typescriptlang.org/)
-- [Vite](https://vitejs.dev/)
-- [TailwindCSS](https://tailwindcss.com/)
-- [React Router](https://reactrouter.com/)
-
----
-
-> Made with ❤️ by the **ORJ Team**
