@@ -25,11 +25,11 @@ const Room = () => {
   }, [roomId, joinRoom]);
 
   return (
-    <div className="flex h-screen">
-      <aside className="w-20 bg-gray-100 flex flex-col items-center py-4 space-y-4">
-        <button onClick={() => setActiveTab('files')} className={activeTab === 'files' ? 'active' : ''}>Files</button>
-        <button onClick={() => setActiveTab('canvas')} className={activeTab === 'canvas' ? 'active' : ''}>Canvas</button>
-        <button onClick={() => setActiveTab('preview')} className={activeTab === 'preview' ? 'active' : ''}>Preview</button>
+    <div className="flex h-screen w-full overflow-x-hidden">
+      <aside className="w-20 bg-gray-100 py-4 flex flex-col items-center space-y-4 min-w-[20vw]">
+        <button onClick={() => setActiveTab('files')} className={`w-[100px] bg-gray-200 hover:bg-gray-800 transition-colors rounded-lg px-5 py-2 cursor-pointer text-gray-700 hover:text-primary-600 ${activeTab === 'files' ? 'active' : ''}`}>Files</button>
+        <button onClick={() => setActiveTab('canvas')} className={`w-[100px] bg-gray-200 hover:bg-gray-800 transition-colors rounded-lg px-5 py-2 cursor-pointer text-gray-700 hover:text-primary-600 ${activeTab === 'canvas' ? 'active' : ''}`}>Canvas</button>
+        <button onClick={() => setActiveTab('preview')} className={`w-[100px] bg-gray-200 hover:bg-gray-800 transition-colors rounded-lg px-5 py-2 cursor-pointer text-gray-700 hover:text-primary-600 ${activeTab === 'preview' ? 'active' : ''}`}>Preview</button>
       </aside>
       <main className="flex-1 flex flex-col">
         <header className="flex justify-between items-center p-4 bg-white shadow">

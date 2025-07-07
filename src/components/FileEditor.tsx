@@ -5,7 +5,7 @@ const FileEditor: React.FC = () => {
   const [code, setCode] = useState<string>("<html>\n  <head>\n    <title>Sample</title>\n  </head>\n  <body>\n    <h1>Hello, Monaco Editor!</h1>\n  </body>\n</html>");
 
   return (
-    <div className="h-full p-4">
+    <div className="h-full max-w-[4/6] p-4">
       <Editor
         height="100%"
         defaultLanguage="html"
