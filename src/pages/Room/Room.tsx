@@ -3,13 +3,16 @@ import { useParams } from 'react-router-dom';
 import { useUser } from '../../context/UserContext';
 import { useRoom } from '../../context/RoomContext';
 import React from 'react';
+import FileEditor from '../../components/FileEditor';
+import CanvasBoard from '../../components/CanvasBoard';
+import LivePreview from '../../components/LivePreview';
 
-const FileEditor = () => <div>File Editor Placeholder</div>;
-const CanvasBoard = () => <div>Canvas Board Placeholder</div>;
-const LivePreview = () => <div>Live Preview Placeholder</div>;
+// const FileEditor = () => <div>File Editor Placeholder</div>;
+// const CanvasBoard = () => <div>Canvas Board Placeholder</div>;
+// const LivePreview = () => <div>Live Preview Placeholder</div>;
 
 const Room = () => {
-  const { roomId } = useParams();
+  const { roomId } = useParams<{ roomId: string }>();
   const { logout } = useUser();
   const { joinRoom } = useRoom();
   const [activeTab, setActiveTab] = useState<'files' | 'canvas' | 'preview'>('files');
@@ -36,7 +39,7 @@ const Room = () => {
         <section className="flex-1 p-4 overflow-auto">
           {activeTab === 'files' && <FileEditor />}
           {activeTab === 'canvas' && <CanvasBoard />}
-          {activeTab === 'preview' && <LivePreview />}
+          {activeTab === 'preview' && <LivePreview html = {"<html><body><h1 id='heading'>Hello World</h1></body></html>"}  css={"*{background-color:black;color:white;}"} js={"document.getElementById('heading').style.border:'1px solid red;'"} />}
         </section>
       </main>
     </div>

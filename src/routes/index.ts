@@ -20,7 +20,7 @@ const routes = [
     protected: true,
   },
   {
-    path: '/room',
+    path: '/room/:roomId',
     component: Room,
     exact: true,
     protected: true,

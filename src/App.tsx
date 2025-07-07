@@ -27,7 +27,7 @@ function App() {
           <Route element={<ProtectedRoute />}>
             <Route path="/" element={<MainLayout />}>
               <Route index element={<Dashboard />} />
-              <Route path="room" element={<Room />} />
+              <Route path="room/:roomId" element={<Room />} />
             </Route>
           </Route>
         </Routes>

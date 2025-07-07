@@ -1,3 +1,5 @@
+import { Link } from "react-router-dom";
+
 const Sidebar = () => {
   return (
     <aside className="w-64 bg-gray-100 h-full p-6 flex flex-col gap-4">
@@ -8,7 +10,7 @@ const Sidebar = () => {
         <ul className="space-y-2">
           {[1,2,3].map(id => (
             <li key={id}>
-              <a href={`#/room/${id}`} className="block px-3 py-2 rounded hover:bg-gray-200">Room {id}</a>
+              <Link to={`/room/${id}`} className="block px-3 py-2 rounded hover:bg-gray-200">Room {id}</Link>
             </li>
           ))}
         </ul>
