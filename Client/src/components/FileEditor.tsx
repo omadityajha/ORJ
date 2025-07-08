@@ -1,58 +1,13 @@
 import React, { useState } from 'react';
 import Editor from '@monaco-editor/react';
-import FileTree, { getFileTypeInfo } from './FileTree';
-import type { FileNode } from './FileTree';
+import FileTree from './FileTree';
 import { PanelLeft } from 'lucide-react';
 import { ResizableBox } from 'react-resizable';
-
-// ✅ Recursive tree updater to update file content
-const updateTree = (
-  nodes: FileNode[],
-  id: string,
-  updater: (node: FileNode) => FileNode
-): FileNode[] => {
-  return nodes.map((node) => {
-    if (node.id === id) return updater(node);
-    if (node.children) {
-      return {
-        ...node,
-        children: updateTree(node.children, id, updater)
-      };
-    }
-    return node;
-  });
-};
-
-// File tree data structure
-const initialFileTree: FileNode[] = [{
- id: '1',
-    name: 'src',
-    type: 'folder',
-    isOpen: true,
-    children:[
-      { id: '2', name: 'index.html', type: 'file' , content:`<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
-    <link rel="stylesheet" href="styles.css">
-</head>
-<body>
-    <script src="script.js" href="script.js"></script>
-</body>
-</html>`},
-      { id: '3', name: 'style.js', type: 'file' ,content:`*{
-        margin: 0;
-        padding: 0;
-        }`},
-      { id: '4', name: 'script.js', type: 'file',content:`// code here`}
-    ] 
-}];
+import { useFileTree } from '../context/FileTreeContext';
+import { type FileNode,getFileTypeInfo,updateTree } from '../lib/utility';
 
 const FileEditor: React.FC = () => {
-  const [fileTree, setFileTree] = useState<FileNode[]>(initialFileTree); // set initial tree if needed
-  const [selectedFile, setSelectedFile] = useState<FileNode | null>(null);
+  const {fileTree, setFileTree, selectedFile ,setSelectedFile} = useFileTree();
   const [panel,setPanel] = useState<boolean>(true);
 
   const handleFileSelect = (file: FileNode) => {
@@ -72,7 +27,7 @@ const FileEditor: React.FC = () => {
   };
 
   return (
-    <div className="w-full h-full flex">
+    <div className="w-full h-screen flex">
       {panel && (
       <ResizableBox 
         axis="x"
@@ -86,24 +41,22 @@ const FileEditor: React.FC = () => {
         // className="w-2/6 flex-shrink-0 border-r resize-x overflow-auto"
         >
         <FileTree
-          fileTree={fileTree}
-          setFileTree={setFileTree}
           onFileSelect={handleFileSelect}
         />
       </ResizableBox>)}
 
       {selectedFile ? (
         <div className="flex-1 w-4/6">
-          <div className="h-10 p-3 border-b border-gray-200 bg-gray-50 flex justify-between">
-            <h3 className="text-sm font-medium text-gray-900">{selectedFile.name}</h3>
-            <PanelLeft className="cursor-pointer" onClick={()=>{setPanel((prev)=>!prev)}}/>
+          <div className="h-10 p-3 bg-gray-800 text-secondary-500 flex justify-between">
+            <h3 className="text-sm font-medium ">{selectedFile.name}</h3>
+            <PanelLeft className="cursor-pointer " onClick={()=>{setPanel((prev)=>!prev)}}/>
           </div>
           <Editor
             height="100%"
             language={getFileTypeInfo(selectedFile.name)?.type} // or use 
             value={selectedFile.content ?? ''}
             onChange={handleFileChange}
-            theme="vs"
+            theme="vs-dark"
             options={{
               fontSize: 14,
               wordWrap: 'on',

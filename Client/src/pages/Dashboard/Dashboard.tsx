@@ -21,15 +21,20 @@ const Dashboard = () => {
   };
 
   return (
-    <div className="flex h-screen bg-gray-50">
+    <div className="flex h-screen bg-gradient-to-br from-gray-950 via-gray-900 to-gray-800">
       <Sidebar />
-      <main className="flex-1 flex flex-col">
+      <main className="flex-1 flex flex-col items-center justify-center min-h-screen">
         <Header />
-        <section className="p-6 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 overflow-auto">
-          {dummyRooms.map(room => (
-            <RoomCard key={room.id} {...room} />
-          ))}
-        </section>
+        <div className="w-full max-w-6xl px-4 py-8 flex flex-col items-center">
+          <div className="w-full rounded-2xl bg-white/10 backdrop-blur-md shadow-xl p-8 mt-8 animate-fade-in">
+            <h1 className="text-3xl font-bold text-white mb-8 tracking-tight drop-shadow">Dashboard</h1>
+            <section className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+              {dummyRooms.map((room) => (
+                <RoomCard key={room.id} {...room}/>
+              ))}
+            </section>
+          </div>
+        </div>
       </main>
     </div>
   );

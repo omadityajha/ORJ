@@ -8,6 +8,7 @@ import MainLayout from './layouts/MainLayout'
 import ProtectedRoute from './components/ProtectedRoute'
 import './index.css'
 import { RoomProvider } from './context/RoomContext'
+import { FileTreeProvider } from './context/FileTreeContext'
 
 // Lazy load pages for better performance
 const Login = lazy(() => import('./pages/Login/Login'))
@@ -18,6 +19,7 @@ function App() {
   return (
     <RoomProvider>
     <UserProvider>
+    <FileTreeProvider>
       <BrowserRouter>
       <Suspense fallback={<div className="flex items-center justify-center h-screen">Loading...</div>}>
         <Routes>
@@ -33,6 +35,7 @@ function App() {
         </Routes>
       </Suspense>
       </BrowserRouter>
+    </FileTreeProvider>
     </UserProvider>
     </RoomProvider>
   );

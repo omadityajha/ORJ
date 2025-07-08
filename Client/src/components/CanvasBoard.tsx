@@ -65,16 +65,16 @@ const CanvasBoard: React.FC = () => {
   };
 
   return (
-    <div className="flex flex-col h-full">
-      <div className="flex items-center space-x-4 p-2 bg-gray-800 text-white">
+    <div className="flex flex-col h-full bg-gray-950 rounded-xl shadow-lg overflow-hidden">
+      <div className="flex items-center space-x-4 p-2 bg-gray-900 text-white rounded-t-lg shadow">
         <button
-          className={`px-3 py-1 rounded ${tool === 'pencil' ? 'bg-blue-600' : 'bg-gray-600'}`}
+          className={`px-3 py-1 rounded-lg transition ${tool === 'pencil' ? 'bg-primary-600' : 'bg-gray-700 hover:bg-gray-600'}`}
           onClick={() => setTool('pencil')}
         >
           Pencil
         </button>
         <button
-          className={`px-3 py-1 rounded ${tool === 'eraser' ? 'bg-blue-600' : 'bg-gray-600'}`}
+          className={`px-3 py-1 rounded-lg transition ${tool === 'eraser' ? 'bg-primary-600' : 'bg-gray-700 hover:bg-gray-600'}`}
           onClick={() => setTool('eraser')}
         >
           Eraser
@@ -84,18 +84,18 @@ const CanvasBoard: React.FC = () => {
             type="color"
             value={color}
             onChange={(e) => setColor(e.target.value)}
-            className="ml-2 w-10 h-8 p-0 border-0 cursor-pointer"
+            className="ml-2 w-10 h-8 p-0 border-0 cursor-pointer rounded"
             title="Select pencil color"
           />
         )}
         <button
-          className="ml-auto px-3 py-1 rounded bg-red-600 hover:bg-red-700"
+          className="ml-auto px-3 py-1 rounded-lg bg-red-600 hover:bg-red-700 transition"
           onClick={clearCanvas}
         >
           Clear Canvas
         </button>
       </div>
-      <div ref={containerRef} className="flex-grow">
+      <div ref={containerRef} className="flex-grow bg-white">
         <canvas id="canvas" className="w-full h-full" />
       </div>
     </div>
