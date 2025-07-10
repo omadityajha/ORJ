@@ -1,102 +1,145 @@
-import React, { useEffect, useRef, useState } from 'react';
-import * as fabric from 'fabric'; // ✅ Correct import
+import React, { useRef, useState } from 'react';
+import { Excalidraw, exportToBlob, serializeAsJSON } from '@excalidraw/excalidraw';
+import '@excalidraw/excalidraw/index.css';
+
+const sampleElements = [
+  {
+    id: 'rect1',
+    type: 'rectangle',
+    x: 100,
+    y: 100,
+    width: 200,
+    height: 100,
+    angle: 0,
+    strokeColor: '#4f46e5',
+    backgroundColor: 'transparent',
+    fillStyle: 'hachure',
+    strokeWidth: 2,
+    roughness: 1,
+    opacity: 100,
+    groupIds: [],
+    roundness: null,
+    seed: 1,
+    version: 1,
+    versionNonce: 1,
+    isDeleted: false,
+    boundElementIds: null,
+    updated: Date.now(),
+    link: null,
+    locked: false,
+    customData: {},
+  },
+  {
+    id: 'text1',
+    type: 'text',
+    x: 120,
+    y: 130,
+    width: 180,
+    height: 40,
+    angle: 0,
+    strokeColor: '#f59e42',
+    backgroundColor: 'transparent',
+    fillStyle: 'solid',
+    strokeWidth: 1,
+    roughness: 0,
+    opacity: 100,
+    groupIds: [],
+    roundness: null,
+    seed: 2,
+    version: 1,
+    versionNonce: 2,
+    isDeleted: false,
+    boundElementIds: null,
+    updated: Date.now(),
+    link: null,
+    locked: false,
+    customData: {},
+    text: 'Sample Drawing',
+    fontSize: 24,
+    fontFamily: 1,
+    textAlign: 'center',
+    verticalAlign: 'middle',
+    baseline: 20,
+  },
+];
 
 const CanvasBoard: React.FC = () => {
-  const canvasRef = useRef<fabric.Canvas | null>(null);
-  const containerRef = useRef<HTMLDivElement>(null);
-  const [tool, setTool] = useState<'pencil' | 'eraser'>('pencil');
-  const [color, setColor] = useState<string>('#000000');
+  const excalidrawRef = useRef<any>(null); // Use 'any' or the correct type if available
+  const [viewMode, setViewMode] = useState(false);
 
-  useEffect(() => {
-    if (!containerRef.current) return;
-
-    const canvas = new fabric.Canvas('canvas', {
-      isDrawingMode: true,
-      backgroundColor: '#fff',
-      width: containerRef.current.clientWidth,
-      height: containerRef.current.clientHeight,
+  // Export as PNG
+  const handleExportPNG = async () => {
+    if (!excalidrawRef.current) return;
+    const blob = await exportToBlob({
+      elements: excalidrawRef.current.getSceneElements(),
+      appState: excalidrawRef.current.getAppState(),
+      files: excalidrawRef.current.getFiles(),
+      mimeType: 'image/png',
     });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'excalidraw-canvas.png';
+    a.click();
+    URL.revokeObjectURL(url);
+  };
 
-    canvas.freeDrawingBrush = new fabric.PencilBrush(canvas);
-    canvas.freeDrawingBrush.width = 2;
-    canvas.freeDrawingBrush.color = color;
+  // Export as JSON
+  const handleExportJSON = () => {
+    if (!excalidrawRef.current) return;
+    const json = serializeAsJSON(
+      excalidrawRef.current.getSceneElements(),
+      excalidrawRef.current.getAppState(),
+      excalidrawRef.current.getFiles(),
+      'local'
+    );
+    // For now, just log it
+    console.log(json);
+    alert('Canvas JSON has been logged to the console.');
+  };
 
-    canvasRef.current = canvas;
+  // Clear Canvas
+  const handleClear = () => {
+    excalidrawRef.current?.updateScene({ elements: [] });
+  };
 
-    const handleResize = () => {
-      if (!containerRef.current || !canvasRef.current) return;
-      const { clientWidth, clientHeight } = containerRef.current;
-      canvasRef.current.setWidth(clientWidth);
-      canvasRef.current.setHeight(clientHeight);
-      canvasRef.current.renderAll();
-    };
+  // Load Sample Drawing
+  const handleLoadSample = () => {
+    excalidrawRef.current?.updateScene({ elements: sampleElements });
+  };
 
-    window.addEventListener('resize', handleResize);
-
-    return () => {
-      window.removeEventListener('resize', handleResize);
-      canvas.dispose();
-      canvasRef.current = null;
-    };
-  }, []);
-
-  useEffect(() => {
-    if (!canvasRef.current) return;
-
-    const brush = new fabric.PencilBrush(canvasRef.current);
-
-    if (tool === 'pencil') {
-      brush.color = color;
-      brush.width = 2;
-    } else if (tool === 'eraser') {
-      brush.color = '#ffffff';
-      brush.width = 10;
-    }
-
-    canvasRef.current.isDrawingMode = true;
-    canvasRef.current.freeDrawingBrush = brush;
-  }, [tool, color]);
-
-  const clearCanvas = () => {
-    if (!canvasRef.current) return;
-    canvasRef.current.clear();
-    canvasRef.current.backgroundColor = '#fff';
-    canvasRef.current.renderAll();
+  // Toggle View/Edit Mode
+  const handleToggleMode = () => {
+    setViewMode((prev) => !prev);
   };
 
   return (
-    <div className="flex flex-col h-full bg-gray-950 rounded-xl shadow-lg overflow-hidden">
-      <div className="flex items-center space-x-4 p-2 bg-gray-900 text-white rounded-t-lg shadow">
-        <button
-          className={`px-3 py-1 rounded-lg transition ${tool === 'pencil' ? 'bg-primary-600' : 'bg-gray-700 hover:bg-gray-600'}`}
-          onClick={() => setTool('pencil')}
-        >
-          Pencil
+    <div className="flex flex-col h-full min-h-[600px] bg-gray-950 rounded-xl shadow-lg overflow-hidden">
+      {/* Toolbar */}
+      <div className="flex flex-col sm:flex-row items-center gap-2 p-2 bg-gray-900 text-white rounded-t-lg shadow z-10">
+        <button className="btn btn-primary px-3 py-1 rounded-lg" onClick={handleExportPNG}>
+          Export as PNG
         </button>
-        <button
-          className={`px-3 py-1 rounded-lg transition ${tool === 'eraser' ? 'bg-primary-600' : 'bg-gray-700 hover:bg-gray-600'}`}
-          onClick={() => setTool('eraser')}
-        >
-          Eraser
+        <button className="btn px-3 py-1 rounded-lg bg-secondary-600 hover:bg-secondary-700" onClick={handleExportJSON}>
+          Export JSON
         </button>
-        {tool === 'pencil' && (
-          <input
-            type="color"
-            value={color}
-            onChange={(e) => setColor(e.target.value)}
-            className="ml-2 w-10 h-8 p-0 border-0 cursor-pointer rounded"
-            title="Select pencil color"
-          />
-        )}
-        <button
-          className="ml-auto px-3 py-1 rounded-lg bg-red-600 hover:bg-red-700 transition"
-          onClick={clearCanvas}
-        >
+        <button className="btn px-3 py-1 rounded-lg bg-red-600 hover:bg-red-700" onClick={handleClear}>
           Clear Canvas
         </button>
+        <button className="btn px-3 py-1 rounded-lg bg-green-600 hover:bg-green-700" onClick={handleLoadSample}>
+          Load Sample Drawing
+        </button>
+        <button className="btn px-3 py-1 rounded-lg bg-gray-700 hover:bg-gray-600 ml-auto" onClick={handleToggleMode}>
+          {viewMode ? 'Switch to Edit Mode' : 'Switch to View Mode'}
+        </button>
       </div>
-      <div ref={containerRef} className="flex-grow bg-white">
-        <canvas id="canvas" className="w-full h-full" />
+      {/* Excalidraw Canvas */}
+      <div className="flex-1 min-h-0 min-w-0 h-full w-full">
+        <Excalidraw
+          excalidrawAPI={(api) => { excalidrawRef.current = api; }}
+          theme="dark"
+          viewModeEnabled={viewMode}
+        />
       </div>
     </div>
   );
