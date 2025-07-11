@@ -36,7 +36,7 @@ const Room = () => {
           <h1 className="text-xl font-bold text-primary-500">Room: {roomId}</h1>
           <button onClick={logout} className="btn btn-logout text-gray-300">Logout</button>
         </header>
-        <section className="flex-1 overflow-hidden">
+        <section className="flex-1 overflow-hidden w-full">
           {activeTab === 'files' && <FileEditor />}
           {activeTab === 'canvas' && <CanvasBoard />}
           {activeTab === 'preview' && <LivePreview html = {"<html><body><h1 id='heading'>Hello World</h1></body></html>"}  css={"*{background-color:black;color:white;}"} js={"document.getElementById('heading').style.border='1px solid red;'"} />}

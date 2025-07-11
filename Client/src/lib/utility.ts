@@ -5,7 +5,7 @@ interface FileNode {
   type: 'file' | 'folder';
   isOpen?: boolean;
   children?: FileNode[];
-  content?:string;
+  path:string;
 }
 
 
@@ -45,34 +45,6 @@ interface FileTypeInfo {
   category: 'code' | 'markup' | 'data' | 'media' | 'document' | 'config' | 'other';
   language?: string;
 }
-
-// File tree data structure
-export const initialFileTree: FileNode[] = [{
- id: '1',
-    name: 'src',
-    type: 'folder',
-    isOpen: true,
-    children:[
-      { id: '2', name: 'index.html', type: 'file' , content:`<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
-    <link rel="stylesheet" href="styles.css">
-</head>
-<body>
-    <script src="script.js" href="script.js"></script>
-</body>
-</html>`},
-      { id: '3', name: 'style.css', type: 'file' ,content:`*{
-        margin: 0;
-        padding: 0;
-        }`},
-      { id: '4', name: 'script.js', type: 'file',content:`// code here`}
-    ] 
-}];
-
 
 const fileTypeMap: Record<string, FileTypeInfo> = {
     // JavaScript/TypeScript
@@ -190,7 +162,6 @@ const updateTree = (
     return node;
   });
 };
-
 
 
 // Export the function for external use

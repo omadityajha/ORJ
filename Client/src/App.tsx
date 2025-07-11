@@ -8,7 +8,8 @@ import MainLayout from './layouts/MainLayout'
 import ProtectedRoute from './components/ProtectedRoute'
 import './index.css'
 import { RoomProvider } from './context/RoomContext'
-import { FileTreeProvider } from './context/FileTreeContext'
+import { FileTreeProvider } from './context/FileTreeContext.tsx'
+import { SocketProvider } from './context/SocketProvider'
 
 // Lazy load pages for better performance
 const Login = lazy(() => import('./pages/Login/Login'))
@@ -17,6 +18,7 @@ const Room = lazy(() => import('./pages/Room/Room'))
 
 function App() {
   return (
+    <SocketProvider>
     <RoomProvider>
     <UserProvider>
     <FileTreeProvider>
@@ -38,6 +40,7 @@ function App() {
     </FileTreeProvider>
     </UserProvider>
     </RoomProvider>
+    </SocketProvider>
   );
 }
 

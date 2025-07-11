@@ -1,6 +1,5 @@
-import React, { createContext, useContext, useState } from 'react';
-
-import { type FileNode,initialFileTree } from '../lib/utility';
+import React, { createContext, useContext, useState, useEffect } from 'react';
+import { type FileNode } from '../lib/utility'; // your FileNode type
 
 // Context type
 interface FileTreeContextType {
@@ -8,6 +7,7 @@ interface FileTreeContextType {
   setFileTree: React.Dispatch<React.SetStateAction<FileNode[]>>;
   selectedFile: FileNode | null;
   setSelectedFile: (file: FileNode | null) => void;
+  fetchFileTree: ()=>void;
 }
 
 // Create context
@@ -15,8 +15,18 @@ const FileTreeContext = createContext<FileTreeContextType | undefined>(undefined
 
 // Provider component
 export const FileTreeProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const [fileTree, setFileTree] = useState<FileNode[]>(initialFileTree);
+  const [fileTree, setFileTree] = useState<FileNode[]>([]);
   const [selectedFile, setSelectedFile] = useState<FileNode | null>(null);
+
+  const fetchFileTree = async () => {
+      try {
+        const res = await fetch('http://localhost:9000/files'); // backend endpoint
+        const data = await res.json();
+        setFileTree(data); // update context state
+      } catch (err) {
+        console.error('Failed to fetch file tree:', err);
+      }
+    };
 
   return (
     <FileTreeContext.Provider
@@ -25,6 +35,7 @@ export const FileTreeProvider: React.FC<{ children: React.ReactNode }> = ({ chil
         setFileTree,
         selectedFile,
         setSelectedFile,
+        fetchFileTree
       }}
     >
       {children}
