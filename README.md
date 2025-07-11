@@ -1,20 +1,21 @@
-# 📁 RealTime Collaborative App ( Code-Editor + Canvas + Preview )
+# 📁 RealTime Collaborative App (Code Editor + Canvas + Terminal + Live Preview)
 
-This project is a **real-time collaborative platform** where multiple users can work inside a shared "room" (folder), each editing different files (code editors or canvas) with live synchronization, user presence, and role-based access.
+A **real-time collaborative platform** for developers and teams to work together inside shared rooms (folder-based workspaces). Includes live file editing, a whiteboard (Excalidraw), terminal execution, and preview – all synced live via CRDTs.
 
 ---
 
 ## 🚀 Features
 
-* 📂 Folder-based workspace (room = folder)
-* 🧑‍💻 Monaco-based code editor with multiple files
-* 🎨 Fabric.js-based whiteboard with color tools
-* 📡 Real-time collaboration via Yjs + Socket.IO
-* 👤 Live presence & cursor sharing (Awareness API)
-* 🔐 JWT-based authentication (Leader / Member roles)
-* 🗃️ File + folder save/load system using MongoDB
-* 📥 Download full folder as ZIP
-* 🖥️ Electron-ready for future desktop version
+✅ **Folder-based workspaces**
+🦰 **Monaco Editor** for code with language support
+🎨 **Excalidraw Whiteboard** for sketching ideas
+📱 **Real-time collaboration** using Yjs + Socket.IO
+👭 **Live presence & cursor sharing**
+🔐 **JWT-based authentication** with role control
+🔦 **Terminal Integration** (run files based on extension)
+📅 **Persistent folder/file structure using local FS**
+📊 **Live FS sync with chokidar**
+🌟 **Electron-compatible**
 
 ---
 
@@ -23,64 +24,124 @@ This project is a **real-time collaborative platform** where multiple users can 
 ### Frontend
 
 * React + TypeScript
-* Monaco Editor (VS Code experience)
-* Fabric.js (Canvas Drawing)
+* TailwindCSS
+* Monaco Editor
+* Excalidraw (Canvas whiteboard)
+* Yjs (with Awareness API)
 * Socket.IO-client
-* Yjs (for CRDT-based syncing + awareness)
 
 ### Backend
 
 * Node.js + Express
 * Socket.IO
-* JWT Auth
-* MongoDB + GridFS (file tree, folders, file content)
+* node-pty (cross-platform terminal support)
+* chokidar (FS watching)
+* chardet (encoding detection)
+* MongoDB (file tree persistence - planned)
 
 ---
 
-## 🧠 Architecture Overview
+## ⚙️ How It Works
 
 ```
-🧑‍💻 User (Browser or Electron)
-     │
- ┌───┴─────────────┐
- ▼                 ▼
-Monaco Editor   Fabric Canvas
-     │                 │
-     └──── Yjs Document (Shared) ───┘
-               │
-         Socket.IO (Custom Yjs Provider)
-               │
-      ┌────────┴────────┐
-      ▼                 ▼
-  Yjs CRDT Engine   Awareness State
-               │
-      ┌────────┴────────┐
-      ▼                 ▼
- MongoDB (files,     JWT Auth (roles,
- folders, tree)      access control)
+🧑 User (Browser)
+   │
+ └️️️️️️️️️️️️️️┐
+ ▼              ▼
+Monaco        Excalidraw
+Editor        Canvas
+   │              │
+   └️Yjs CRDT Doc┘
+         │
+     Awareness + Sync
+         │
+    Socket.IO Provider
+         │
+ └️️️️️️️️️️️️️️┐
+ ▼                ▼
+File System    Terminal (pty)
+     │               │
+     ▼               ▼
+Backend FS     Real Shell Process
 ```
 
 ---
 
-## 📁 Folder & File Model (MongoDB)
+## 💻 Folder & File Schema (MongoDB - planned)
 
-```js
+```ts
 {
   _id: ObjectId,
   roomId: 'team123',
+  name: 'index.js',
   type: 'file' | 'folder',
-  name: 'main.tsx',
   parent: 'src/',
-  content: '...code or base64...',
+  content: '...code...',
   createdBy: 'userId123'
 }
 ```
 
 ---
 
-## 🛠️ Setup & Run
+## 📂 Folder Tree from Backend (`GET /files`)
 
-### 1️⃣ Clone the Project
+* Dynamically generated from the `./user` folder
+* Files/folders emit live updates via `chokidar`
+* Synced with frontend automatically
+
+---
+
+## 💡 Run File via Terminal
+
+A run button is available per file. When clicked, a mapped command is executed via `node-pty`.
+
+### Supported Extensions & Commands:
+
+| Extension | Command                            |
+| --------- | ---------------------------------- |
+| `.js`     | `node file.js`                     |
+| `.ts`     | `ts-node file.ts`                  |
+| `.py`     | `python file.py`                   |
+| `.sh`     | `bash script.sh`                   |
+| `.c`      | `gcc file.c -o out && ./out`       |
+| `.cpp`    | `g++ file.cpp -o out && ./out`     |
+| `.java`   | `javac file.java && java FileName` |
+| `.go`     | `go run file.go`                   |
+| `.rb`     | `ruby file.rb`                     |
+| `.php`    | `php file.php`                     |
+| `.rs`     | `rustc file.rs && ./file`          |
+
+---
+
+## 🔌 node-pty Installation
+
+### 🛠️ Windows
+
+```bash
+npm install --save node-pty
+```
+
+Ensure:
+
+```bash
+npm install --global windows-build-tools
+```
+
+### 🐙 Linux / 📕 macOS
+
+```bash
+sudo apt install -y make g++ python3
+npm install --save node-pty
+```
+
+> Node.js 20+ required
+> On Linux/macOS, ensure `make`, `g++`, and `python3` are available
+
+---
+
+## 💦 Setup & Run
+
+### 1️⃣ Clone the Repository
 
 ```bash
 git clone https://github.com/omadityajha/ORJ.git
@@ -99,7 +160,7 @@ cd ../server
 npm install
 ```
 
-### 3️⃣ Start Development Servers
+### 3️⃣ Start the Development Servers
 
 ```bash
 # Backend
@@ -108,34 +169,29 @@ node index.js
 
 # Frontend
 cd ../client
-npm start
+npm run dev  # or npm start
 ```
 
-App runs at `http://localhost:3000`.
+Visit: `http://localhost:3000`
 
 ---
 
-## 🔧 Development Phases
+## ⚠️ In Progress
 
-| Phase | Focus                          |
-| ----- | ------------------------------ |
-| 1️⃣   | Monaco + file tree UI          |
-| 2️⃣   | Fabric + canvas tools          |
-| 3️⃣   | Socket.IO + Yjs syncing        |
-| 4️⃣   | Awareness & multi-user editing |
-| 5️⃣   | JWT auth, room roles           |
-| 6️⃣   | MongoDB persistence + GridFS   |
-| 7️⃣   | Download folder as ZIP         |
-| 8️⃣   | Optional: Electron version     |
+* ❌ **Download as ZIP** (Not yet added)
+* ✅ **Excalidraw canvas replacing Fabric.js**
+* ✅ Folder-specific file creation, terminal execution
+* ✅ Fixes for new-file behavior and folder toggling
 
 ---
 
 ## 🤝 Contributing
 
-Suggestions, bug reports, and contributions are welcome! Fork it, PR it, or raise an issue.
+All feedback, issues, and PRs are welcome!
+Fork the repo, make your change, and submit a pull request.
 
 ---
 
 ## 📄 License
 
-MIT © 2025 Team - TechSena
+MIT © 2025 – Team TechSena
