@@ -14,6 +14,7 @@ import { FileTreeProvider } from './context/FileTreeContext'
 const Login = lazy(() => import('./pages/Login/Login'))
 const Dashboard = lazy(() => import('./pages/Dashboard/Dashboard'))
 const Room = lazy(() => import('./pages/Room/Room'))
+const Signup = lazy(() => import('./pages/Signup/Signup'))
 
 function App() {
   return (
@@ -24,6 +25,7 @@ function App() {
       <Suspense fallback={<div className="flex items-center justify-center h-screen">Loading...</div>}>
         <Routes>
           <Route path="/login" element={<Login />} />
+          <Route path="/signup" element={<Signup />} />
           
           {/* Protected routes */}
           <Route element={<ProtectedRoute />}>
