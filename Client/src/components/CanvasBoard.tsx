@@ -114,7 +114,7 @@ const CanvasBoard: React.FC = () => {
   };
 
   return (
-    <div className="flex flex-col h-full min-h-[600px] bg-gray-950 rounded-xl shadow-lg overflow-hidden">
+    <div className="flex flex-col h-screen min-h-[600px] bg-gray-950 rounded-xl shadow-lg overflow-hidden">
       {/* Toolbar */}
       <div className="flex flex-col sm:flex-row items-center gap-2 p-2 bg-gray-900 text-white rounded-t-lg shadow z-10">
         <button className="btn btn-primary px-3 py-1 rounded-lg" onClick={handleExportPNG}>

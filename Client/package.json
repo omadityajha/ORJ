@@ -14,7 +14,6 @@
     "@monaco-editor/react": "^4.7.0",
     "@tailwindcss/vite": "^4.1.11",
     "@types/react-router-dom": "^5.3.3",
-    "@xterm/addon-fit": "^0.10.0",
     "@xterm/xterm": "^5.5.0",
     "editor": "^1.0.0",
     "fabric": "^6.7.0",
@@ -23,10 +22,12 @@
     "monaco-editor": "^0.52.2",
     "react": "^19.1.0",
     "react-dom": "^19.1.0",
-    "react-resizable": "^3.0.5",
     "react-router-dom": "^7.6.3",
     "socket.io-client": "^4.8.1",
-    "tailwindcss": "^4.1.11"
+    "tailwindcss": "^4.1.11",
+    "y-monaco": "^0.1.6",
+    "y-protocols": "^1.0.6",
+    "yjs": "^13.6.27"
   },
   "devDependencies": {
     "@eslint/js": "^9.29.0",

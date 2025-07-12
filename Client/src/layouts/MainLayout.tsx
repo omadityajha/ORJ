@@ -12,8 +12,9 @@ const MainLayout = () => {
 
   return (
     <div className="min-h-screen flex flex-col bg-gray-950 text-gray-100">
-      <header className="bg-gray-900 shadow-lg rounded-b-2xl">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      {/* Header */}
+      <header className="bg-gray-900 shadow-lg rounded-b-2xl w-full">
+        <div className="px-4 sm:px-6 lg:px-8 w-full">
           <div className="flex justify-between h-16 items-center">
             <div className="flex-shrink-0 flex items-center">
               <span className="text-xl font-bold text-primary-400">App Logo</span>
@@ -35,9 +36,10 @@ const MainLayout = () => {
           </div>
         </div>
       </header>
-      
-      <main className="flex-grow">
-        <div className="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
+
+      {/* Main content */}
+      <main className="flex-grow w-full">
+        <div className="px-4 sm:px-6 lg:px-10 py-4 w-full">
           {user && (
             <div className="mb-4 text-sm text-gray-400">
               Logged in as: {user.email}
@@ -46,9 +48,10 @@ const MainLayout = () => {
           <Outlet />
         </div>
       </main>
-      
-      <footer className="bg-gray-900 rounded-t-2xl shadow-lg">
-        <div className="max-w-7xl mx-auto px-4 py-6 sm:px-6 lg:px-8">
+
+      {/* Footer */}
+      <footer className="bg-gray-900 rounded-t-2xl shadow-lg w-full">
+        <div className="px-4 py-6 sm:px-6 lg:px-10 w-full">
           <p className="text-center text-sm text-gray-500">
             &copy; {new Date().getFullYear()} Your Company. All rights reserved.
           </p>

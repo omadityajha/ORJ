@@ -1,12 +1,16 @@
 // TypeScript interfaces
 interface FileNode {
-  id: string;
+  id: string;                    // unique frontend identifier
   name: string;
   type: 'file' | 'folder';
   isOpen?: boolean;
   children?: FileNode[];
-  path:string;
+  path: string;                  // full path like 'src/index.js'
+  roomId: string;                // added
+  content?: string;             // optional, for files
+  parent?: string;              // added, e.g., 'src'
 }
+
 
 
 //File type definitions
@@ -146,23 +150,87 @@ const getFileTypeInfo = (fileName: string): FileTypeInfo => {
 };
 
 // ✅ Recursive tree updater to update file content
-const updateTree = (
-  nodes: FileNode[],
-  id: string,
-  updater: (node: FileNode) => FileNode
-): FileNode[] => {
-  return nodes.map((node) => {
-    if (node.id === id) return updater(node);
-    if (node.children) {
-      return {
-        ...node,
-        children: updateTree(node.children, id, updater)
-      };
-    }
-    return node;
-  });
+// const updateTree = (
+//   nodes: FileNode[],
+//   id: string,
+//   updater: (node: FileNode) => FileNode
+// ): FileNode[] => {
+//   return nodes.map((node) => {
+//     if (node.id === id) return updater(node);
+//     if (node.children) {
+//       return {
+//         ...node,
+//         children: updateTree(node.children, id, updater)
+//       };
+//     }
+//     return node;
+//   });
+// };
+
+export const getUniqueName = (base: string, existingNames: Set<string>, ext = ''): string => {
+  if (!existingNames.has(base + ext)) return base + ext;
+  let i = 1;
+  while (existingNames.has(`${base} (${i})${ext}`)) {
+    i++;
+  }
+  return `${base} (${i})${ext}`;
 };
 
+export const buildFileTree = (files: any[], preserveOpenState?: Map<string, boolean>): FileNode[] => {
+    const fileMap = new Map<string, FileNode>();
+    const roots: FileNode[] = [];
 
+    // First pass: create all nodes
+    files.forEach((file) => {
+      const node: FileNode = {
+        id: file._id,
+        name: file.name,
+        type: file.type,
+        path: file.path,
+        roomId: file.roomId,
+        parent: file.parent,
+        isOpen: preserveOpenState ? (preserveOpenState.get(file.path) || false) : false,
+        children: file.type === 'folder' ? [] : undefined,
+        content: file.content
+      };
+      fileMap.set(file.path, node);
+    });
+
+    // Second pass: build tree structure
+    files.forEach((file) => {
+      const node = fileMap.get(file.path);
+      if (!node) return;
+
+      if (!file.parent) {
+        roots.push(node);
+      } else {
+        const parent = fileMap.get(file.parent);
+        if (parent && parent.children) {
+          parent.children.push(node);
+        }
+      }
+    });
+
+    return roots;
+  };
+
+  export  const getOpenState = (nodes: FileNode[]): Map<string, boolean> => {
+      const openState = new Map<string, boolean>();
+      
+      const collect = (nodeList: FileNode[]) => {
+        for (const node of nodeList) {
+          if (node.type === 'folder' && node.isOpen!=undefined) {
+            openState.set(node.path || '', node.isOpen);
+            if (node.children) {
+              collect(node.children);
+            }
+          }
+        }
+      };
+      
+      collect(nodes);
+      return openState;
+    };
+  
 // Export the function for external use
-export { getFileTypeInfo,updateTree, type FileTypeInfo, type FileType,type FileNode };
+export { getFileTypeInfo, type FileTypeInfo, type FileType,type FileNode };

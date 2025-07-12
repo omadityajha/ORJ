@@ -1,25 +1,33 @@
-import React, { createContext, useContext, useMemo } from 'react';
+// context/SocketContext.tsx
+import React, { createContext, useContext, useEffect, useRef, useState } from 'react';
 import { io, Socket } from 'socket.io-client';
 
-// Type the context as Socket or null
 const SocketContext = createContext<Socket | null>(null);
 
-// Custom hook to use socket
-export const useSocket = (): Socket => {
+export const useSocket = () => {
   const socket = useContext(SocketContext);
   if (!socket) {
-    throw new Error('useSocket must be used within a SocketProvider');
+    throw new Error("useSocket must be used within a SocketProvider");
   }
   return socket;
 };
 
-// SocketProvider component
-export function SocketProvider({ children }: React.PropsWithChildren) {
-  const socket = useMemo(() => io('http://localhost:9000'), []);
+export const SocketProvider = ({ children, roomId }: { children: React.ReactNode; roomId: string }) => {
+  const [socket, setSocket] = useState<Socket | null>(null);
 
-  return (
-    <SocketContext.Provider value={socket}>
-      {children}
-    </SocketContext.Provider>
-  );
-}
+  useEffect(() => {
+    const newSocket = io('http://localhost:9000', {
+      query: { roomId },
+      transports: ['websocket'],
+    });
+    setSocket(newSocket);
+
+    return () => {
+      newSocket.disconnect();
+    };
+  }, [roomId]);
+
+  if (!socket) return null; // ⛔ Prevent child render before socket is set
+
+  return <SocketContext.Provider value={socket}>{children}</SocketContext.Provider>;
+};

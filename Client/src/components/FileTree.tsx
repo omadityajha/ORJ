@@ -1,19 +1,18 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { 
   ChevronRight, 
   ChevronDown, 
   File, 
   Folder, 
   FolderOpen,
-  Plus,
   MoreHorizontal,
   Edit3,
-  Trash2,
-  Copy
+  Trash2
 } from 'lucide-react';
-import { getFileTypeInfo, type FileTypeInfo, type FileType, type FileNode } from '../lib/utility';
+import { getFileTypeInfo, type FileTypeInfo, type FileNode,buildFileTree } from '../lib/utility';
 import { useFileTree } from "../context/FileTreeContext";
 import { useSocket } from "../context/SocketProvider";
+import { useParams } from 'react-router-dom';
 
 interface FileIconProps {
   fileName: string;
@@ -36,62 +35,8 @@ interface FileTreeProps {
 
 const FileIcon: React.FC<FileIconProps> = ({ fileName, className = "" }) => {
   const fileTypeInfo: FileTypeInfo = getFileTypeInfo(fileName);
-  const iconClass: string = `w-4 h-4 ${className}`;
-  
-  switch (fileTypeInfo.type) {
-    case 'javascript':
-    case 'typescript':
-      return <File className={`${iconClass} ${fileTypeInfo.color}`} />;
-    case 'css':
-      return <File className={`${iconClass} ${fileTypeInfo.color}`} />;
-    case 'html':
-      return <File className={`${iconClass} ${fileTypeInfo.color}`} />;
-    case 'json':
-      return <File className={`${iconClass} ${fileTypeInfo.color}`} />;
-    case 'markdown':
-      return <File className={`${iconClass} ${fileTypeInfo.color}`} />;
-    case 'python':
-      return <File className={`${iconClass} ${fileTypeInfo.color}`} />;
-    case 'java':
-      return <File className={`${iconClass} ${fileTypeInfo.color}`} />;
-    case 'cpp':
-      return <File className={`${iconClass} ${fileTypeInfo.color}`} />;
-    case 'csharp':
-      return <File className={`${iconClass} ${fileTypeInfo.color}`} />;
-    case 'php':
-      return <File className={`${iconClass} ${fileTypeInfo.color}`} />;
-    case 'ruby':
-      return <File className={`${iconClass} ${fileTypeInfo.color}`} />;
-    case 'go':
-      return <File className={`${iconClass} ${fileTypeInfo.color}`} />;
-    case 'rust':
-      return <File className={`${iconClass} ${fileTypeInfo.color}`} />;
-    case 'swift':
-      return <File className={`${iconClass} ${fileTypeInfo.color}`} />;
-    case 'shell':
-      return <File className={`${iconClass} ${fileTypeInfo.color}`} />;
-    case 'xml':
-    case 'yaml':
-      return <File className={`${iconClass} ${fileTypeInfo.color}`} />;
-    case 'dockerfile':
-      return <File className={`${iconClass} ${fileTypeInfo.color}`} />;
-    case 'config':
-      return <File className={`${iconClass} ${fileTypeInfo.color}`} />;
-    case 'image':
-      return <File className={`${iconClass} ${fileTypeInfo.color}`} />;
-    case 'video':
-      return <File className={`${iconClass} ${fileTypeInfo.color}`} />;
-    case 'audio':
-      return <File className={`${iconClass} ${fileTypeInfo.color}`} />;
-    case 'pdf':
-      return <File className={`${iconClass} ${fileTypeInfo.color}`} />;
-    case 'archive':
-      return <File className={`${iconClass} ${fileTypeInfo.color}`} />;
-    case 'text':
-      return <File className={`${iconClass} ${fileTypeInfo.color}`} />;
-    default:
-      return <File className={`${iconClass} text-gray-500`} />;
-  }
+  const iconClass: string = `w-4 h-4 ${className} ${fileTypeInfo.color}`;
+  return <File className={iconClass} />;
 };
 
 const FileTreeNode: React.FC<FileTreeNodeProps> = ({ 
@@ -107,29 +52,40 @@ const FileTreeNode: React.FC<FileTreeNodeProps> = ({
   const [newName, setNewName] = useState(node.name);
   const [showContextMenu, setShowContextMenu] = useState(false);
   const socket = useSocket();
+  const { roomId } = useParams<{ roomId: string }>();
+  const { fileTree } = useFileTree();
   const inputRef = useRef<HTMLInputElement>(null);
 
   const handleToggle = (e: React.MouseEvent) => {
     e.stopPropagation();
     onToggle(node);
-    setCurrentFolder(node.path ?? null);
+    // Don't set current folder when toggling - only when selecting
   };
 
   const handleSelect = () => {
     onSelect(node);
+    // Only set current folder when explicitly selecting a folder
     if (node.type === 'folder') {
       setCurrentFolder(node.path ?? null);
-    } else {
-      setCurrentFolder(null);
     }
   };
 
   const handleRename = () => {
-    if (newName.trim() && newName !== node.name) {
-      const parent = node.path?.split('/').slice(0, -1).join('/');
-      const newPath = parent ? `${parent}/${newName.trim()}` : newName.trim();
-      socket.emit('file:rename', { oldPath: node.path, newPath });
+    if (!roomId || !newName.trim() || newName === node.name) {
+      setIsRenaming(false);
+      return;
     }
+
+    const parent = node.path?.split('/').slice(0, -1).join('/') || '';
+    const newPath = parent ? `${parent}/${newName.trim()}` : newName.trim();
+    
+    socket.emit('file:rename', { 
+      roomId, 
+      oldPath: node.path, 
+      newPath,
+      newName: newName.trim()
+    });
+    
     setIsRenaming(false);
   };
 
@@ -156,9 +112,76 @@ const FileTreeNode: React.FC<FileTreeNodeProps> = ({
   };
 
   const handleDelete = () => {
-    socket.emit('file:delete', { filePath: node.path });
+    console.log("handleDelete Called!");
+    if (!roomId) {
+      console.log(roomId)
+      return;
+    }
+    socket.emit('file:delete', { roomId, path: node.path });
     setShowContextMenu(false);
   };
+
+  const getUniqueName = (base: string, ext: string = ''): string => {
+    const siblings = new Set<string>();
+    
+    // Get the current folder context - use the selected folder as parent
+    const targetFolder = node.type === 'folder' ? node.path : node.parent;
+
+    const collect = (nodes: FileNode[]) => {
+      for (const n of nodes) {
+        // Check if this node is a direct child of our target folder
+        if (n.parent === targetFolder || (!targetFolder && !n.parent)) {
+          siblings.add(n.name);
+        }
+        if (n.children) collect(n.children);
+      }
+    };
+
+    collect(fileTree);
+
+    if (!siblings.has(base + ext)) return base + ext;
+    let i = 1;
+    while (siblings.has(`${base} (${i})${ext}`)) {
+      i++;
+    }
+    return `${base} (${i})${ext}`;
+  };
+
+  const handleAdd = (isFolder: boolean) => {
+    if (!roomId) return;
+    
+    const base = isFolder ? 'new-folder' : 'new-file';
+    const ext = isFolder ? '' : '.txt';
+    const uniqueName = getUniqueName(base, ext);
+    
+    // Use the current node as parent context
+    const targetFolder = node.type === 'folder' ? node.path : node.parent;
+    const fullPath = targetFolder ? `${targetFolder}/${uniqueName}` : uniqueName;
+    const parent = targetFolder || '';
+    const type = isFolder ? 'folder' : 'file';
+
+    socket.emit('file:add', {
+      roomId,
+      name: uniqueName,
+      path: fullPath,
+      type,
+      parent,
+    });
+
+    setShowContextMenu(false);
+  };
+
+  // Close context menu when clicking outside
+  useEffect(() => {
+    const handleClickOutside = () => {
+      setShowContextMenu(false);
+    };
+
+    if (showContextMenu) {
+      document.addEventListener('click', handleClickOutside);
+      return () => document.removeEventListener('click', handleClickOutside);
+    }
+  }, [showContextMenu]);
 
   const paddingLeft = level * 16;
 
@@ -250,26 +273,14 @@ const FileTreeNode: React.FC<FileTreeNodeProps> = ({
             <>
               <hr className="my-1 border-gray-200" />
               <button
-                onClick={() => {
-                  socket.emit('file:add', { 
-                    filePath: node.path ? `${node.path}/new-file.txt` : 'new-file.txt',
-                    isFolder: false
-                  });
-                  setShowContextMenu(false);
-                }}
+                onClick={() => handleAdd(false)}
                 className="flex items-center w-full px-3 py-2 text-sm text-gray-700 hover:bg-gray-100"
               >
                 <File className="w-4 h-4 mr-2" />
                 New File
               </button>
               <button
-                onClick={() => {
-                  socket.emit('file:add', { 
-                    filePath: node.path ? `${node.path}/new-folder` : 'new-folder',
-                    isFolder: true
-                  });
-                  setShowContextMenu(false);
-                }}
+                onClick={() => handleAdd(true)}
                 className="flex items-center w-full px-3 py-2 text-sm text-gray-700 hover:bg-gray-100"
               >
                 <Folder className="w-4 h-4 mr-2" />
@@ -300,25 +311,68 @@ const FileTreeNode: React.FC<FileTreeNodeProps> = ({
   );
 };
 
-const getUniqueName = (base: string, existingNames: Set<string>, ext = ''): string => {
-  if (!existingNames.has(base + ext)) return base + ext;
-  let i = 1;
-  while (existingNames.has(`${base} (${i})${ext}`)) {
-    i++;
-  }
-  return `${base} (${i})${ext}`;
-};
-
 const FileTree: React.FC<FileTreeProps> = ({ onFileSelect }) => {
   const { fileTree, setFileTree } = useFileTree();
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [currentFolderPath, setCurrentFolderPath] = useState<string | null>(null);
   const socket = useSocket();
+  const { roomId } = useParams<{ roomId: string }>();
+  
+  // Use a ref to track open state that persists across renders
+  const openStateRef = useRef<Map<string, boolean>>(new Map());
+
+  // Helper function to get current open state
+  const getOpenState = (nodes: FileNode[]): Map<string, boolean> => {
+    const openState = new Map<string, boolean>();
+    
+    const collect = (nodeList: FileNode[]) => {
+      for (const node of nodeList) {
+        if (node.type === 'folder' && node.isOpen!=undefined) {
+          openState.set(node.path || '', node.isOpen);
+          if (node.children) {
+            collect(node.children);
+          }
+        }
+      }
+    };
+    
+    collect(nodes);
+    return openState;
+  };
+
+  // Update open state ref whenever fileTree changes
+  useEffect(() => {
+    if (fileTree.length > 0) {
+      openStateRef.current = getOpenState(fileTree);
+    }
+  }, [fileTree]);
+
+  // Expose buildFileTree function to parent component
+  useEffect(() => {
+    // Update the FileTree context or parent with the buildFileTree function
+    // that preserves open state
+    if (typeof setFileTree === 'function') {
+      const originalSetFileTree = setFileTree;
+      const enhancedSetFileTree = (treeOrUpdater: any) => {
+        if (typeof treeOrUpdater === 'function') {
+          originalSetFileTree(treeOrUpdater);
+        } else {
+          // If it's raw data from server, build it with preserved state
+          const builtTree = buildFileTree(treeOrUpdater, openStateRef.current);
+          originalSetFileTree(builtTree);
+        }
+      };
+      
+      // You might want to expose this enhanced function to parent
+      // For now, we'll keep the original logic
+    }
+  }, [setFileTree]);
 
   const handleSelect = (node: FileNode) => {
     setSelectedId(node.id);
-    if(node.type==="file")
-    onFileSelect(node);
+    if (node.type === "file") {
+      onFileSelect(node);
+    }
   };
 
   const handleToggle = (node: FileNode) => {
@@ -330,7 +384,14 @@ const FileTree: React.FC<FileTreeProps> = ({ onFileSelect }) => {
           ? { ...n, children: toggle(n.children) }
           : n
       );
-    setFileTree((prev) => toggle(prev));
+    
+    // Update the file tree
+    setFileTree((prev) => {
+      const newTree = toggle(prev);
+      // Also update the ref immediately
+      openStateRef.current = getOpenState(newTree);
+      return newTree;
+    });
   };
 
   const handleContextMenu = (e: React.MouseEvent, node: FileNode) => {
@@ -339,26 +400,47 @@ const FileTree: React.FC<FileTreeProps> = ({ onFileSelect }) => {
   };
 
   const handleAdd = (isFolder: boolean) => {
+    if (!roomId) return;
+    
     const base = isFolder ? 'new-folder' : 'new-file';
     const ext = isFolder ? '' : '.txt';
-
+    
+    // Use the currently selected folder as the parent, or root if none selected
+    const targetFolder = currentFolderPath;
+    
+    // Get unique name within the target folder
     const siblings = new Set<string>();
     const collect = (nodes: FileNode[]) => {
-      for (const node of nodes) {
-        const parent = node.path?.split('/').slice(0, -1).join('/');
-        if (parent === currentFolderPath || (!currentFolderPath && !parent)) {
-          const name = node.path?.split('/').pop();
-          if (name) siblings.add(name);
+      for (const n of nodes) {
+        if (n.parent === targetFolder || (!targetFolder && !n.parent)) {
+          siblings.add(n.name);
         }
-        if (node.children) collect(node.children);
+        if (n.children) collect(n.children);
       }
     };
     collect(fileTree);
 
-    const uniqueName = getUniqueName(base, siblings, ext);
-    const fullPath = currentFolderPath ? `${currentFolderPath}/${uniqueName}` : uniqueName;
+    const getUniqueName = (baseName: string, extension: string = ''): string => {
+      if (!siblings.has(baseName + extension)) return baseName + extension;
+      let i = 1;
+      while (siblings.has(`${baseName} (${i})${extension}`)) {
+        i++;
+      }
+      return `${baseName} (${i})${extension}`;
+    };
 
-    socket.emit('file:add', { filePath: fullPath, isFolder });
+    const uniqueName = getUniqueName(base, ext);
+    const fullPath = targetFolder ? `${targetFolder}/${uniqueName}` : uniqueName;
+    const parent = targetFolder || '';
+    const type = isFolder ? 'folder' : 'file';
+
+    socket.emit('file:add', {
+      roomId,
+      name: uniqueName,
+      path: fullPath,
+      type,
+      parent,
+    });
   };
 
   return (

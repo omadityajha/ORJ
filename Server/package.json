@@ -1,21 +1,22 @@
 {
   "name": "server",
   "version": "1.0.0",
-  "main": "index.js",
+  "main": "src/index.js",
+  "type": "module",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "dev": "node index.js"
+    "dev": "node src/index.js"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "description": "",
   "dependencies": {
-    "chardet": "^2.1.0",
-    "chokidar": "^4.0.3",
+    "dotenv": "^17.2.0",
     "express": "^5.1.0",
-    "fs-extra": "^11.3.0",
-    "node-pty": "^1.0.0",
-    "socket.io": "^4.8.1"
+    "mongoose": "^8.16.3",
+    "socket.io": "^4.8.1",
+    "y-websocket": "^3.0.0",
+    "yjs": "^13.6.27"
   }
 }

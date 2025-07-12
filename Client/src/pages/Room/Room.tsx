@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useRef, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import { useUser } from '../../context/UserContext';
 import { useRoom } from '../../context/RoomContext';
@@ -6,6 +6,7 @@ import React from 'react';
 import FileEditor from '../../components/FileEditor';
 import CanvasBoard from '../../components/CanvasBoard';
 import LivePreview from '../../components/LivePreview';
+import { useSocket } from '@context/SocketProvider';
 
 // const FileEditor = () => <div>File Editor Placeholder</div>;
 // const CanvasBoard = () => <div>Canvas Board Placeholder</div>;
@@ -16,13 +17,17 @@ const Room = () => {
   const { logout } = useUser();
   const { joinRoom } = useRoom();
   const [activeTab, setActiveTab] = useState<'files' | 'canvas' | 'preview'>('files');
+  const socket = useSocket();
+  const hasJoinedRef = useRef(false);
 
-  // Join room on mount
   React.useEffect(() => {
-    if (roomId) {
-      joinRoom(roomId);
-    }
-  }, [roomId, joinRoom]);
+    if (!roomId || hasJoinedRef.current) return;
+
+    socket.emit("room:join", roomId);
+    joinRoom(roomId);
+    hasJoinedRef.current = true;
+  }, [roomId, socket, joinRoom]);
+
 
   return (
     <div className="grid grid-cols-1 max-lg:grid-rows-6 gap-0 lg:grid-cols-5 w-full">

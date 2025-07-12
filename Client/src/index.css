@@ -1,8 +1,7 @@
-@import 'react-resizable/css/styles.css';
 @import "tailwindcss";
 
 @theme {
-  /* Colors */
+  /* Primary Colors */
   --color-primary-50: #f0f9ff;
   --color-primary-100: #e0f2fe;
   --color-primary-200: #bae6fd;
@@ -15,6 +14,7 @@
   --color-primary-900: #0c4a6e;
   --color-primary-950: #082f49;
 
+  /* Secondary Colors */
   --color-secondary-50: #f5f3ff;
   --color-secondary-100: #ede9fe;
   --color-secondary-200: #ddd6fe;
@@ -27,58 +27,80 @@
   --color-secondary-900: #4c1d95;
   --color-secondary-950: #2e1065;
 
-  /* Font Family */
+  /* Font */
   --font-family-sans: 'Inter', 'Fira Mono', 'Menlo', 'Monaco', 'Consolas', 'Liberation Mono', 'Courier New', monospace, sans-serif;
 }
 
 @layer base {
-  html {
+  html, body, #root {
+    height: 100%;
+    width: 100%;
     font-family: var(--font-family-sans);
     background: #0f172a;
     color: #e2e8f0;
+    scroll-behavior: smooth;
   }
-  
+
   body {
-    @apply bg-gray-950 text-gray-100;
-    min-height: 100vh;
+    @apply bg-gray-950 text-gray-100 antialiased;
     margin: 0;
     padding: 0;
   }
 }
 
 @layer components {
+  /* Base Button */
   .btn {
-    @apply cursor-pointer px-4 py-2 rounded-lg font-medium focus:outline-none focus:ring-2 focus:ring-offset-2 transition;
+    @apply cursor-pointer px-4 py-2 rounded-lg font-medium focus:outline-none focus:ring-2 focus:ring-offset-2 transition duration-200 ease-in-out;
   }
-  
+
+  /* Filled buttons */
   .btn-primary {
     @apply bg-primary-600 text-white hover:bg-primary-700 focus:ring-primary-500;
   }
-  
+
   .btn-secondary {
     @apply bg-secondary-600 text-white hover:bg-secondary-700 focus:ring-secondary-500;
   }
-  
+
+  /* Additional button styles */
+  .btn-outline {
+    @apply border border-white text-white hover:bg-white hover:text-gray-900;
+  }
+
+  .btn-glow {
+    @apply bg-gradient-to-r from-purple-500 to-pink-500 text-white shadow-lg hover:brightness-110;
+  }
+
+  .btn-glass {
+    @apply bg-white/10 backdrop-blur-md text-white border border-white/20 hover:bg-white/20;
+  }
+
+  /* Card base */
   .card {
     @apply bg-gray-900 rounded-xl shadow-lg p-6;
   }
 }
 
+/* Scrollbar Styles */
 ::-webkit-scrollbar {
   width: 8px;
-  background: #1e293b;
+  background-color: #1e293b;
 }
 ::-webkit-scrollbar-thumb {
-  background: #334155;
-  border-radius: 8px;
+  background-color: #6366f1; /* Indigo */
+  border-radius: 10px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background-color: #7c3aed; /* Purple */
 }
 
-/* Remove focus outline for mouse users, keep for keyboard */
+/* Accessibility outline management */
 :focus:not(:focus-visible) {
   outline: none;
 }
 
-/* Custom Animations */
+/* Animations */
 @keyframes fade-in {
   0% {
     opacity: 0;
@@ -89,6 +111,7 @@
     transform: translateY(0) scale(1);
   }
 }
+
 .animate-fade-in {
-  animation: fade-in 0.7s cubic-bezier(0.4,0,0.2,1) both;
+  animation: fade-in 0.7s cubic-bezier(0.4, 0, 0.2, 1) both;
 }

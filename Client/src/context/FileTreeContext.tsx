@@ -7,7 +7,6 @@ interface FileTreeContextType {
   setFileTree: React.Dispatch<React.SetStateAction<FileNode[]>>;
   selectedFile: FileNode | null;
   setSelectedFile: (file: FileNode | null) => void;
-  fetchFileTree: ()=>void;
 }
 
 // Create context
@@ -18,15 +17,6 @@ export const FileTreeProvider: React.FC<{ children: React.ReactNode }> = ({ chil
   const [fileTree, setFileTree] = useState<FileNode[]>([]);
   const [selectedFile, setSelectedFile] = useState<FileNode | null>(null);
 
-  const fetchFileTree = async () => {
-      try {
-        const res = await fetch('http://localhost:9000/files'); // backend endpoint
-        const data = await res.json();
-        setFileTree(data); // update context state
-      } catch (err) {
-        console.error('Failed to fetch file tree:', err);
-      }
-    };
 
   return (
     <FileTreeContext.Provider
@@ -34,8 +24,7 @@ export const FileTreeProvider: React.FC<{ children: React.ReactNode }> = ({ chil
         fileTree,
         setFileTree,
         selectedFile,
-        setSelectedFile,
-        fetchFileTree
+        setSelectedFile
       }}
     >
       {children}
