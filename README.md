@@ -143,8 +143,8 @@ Visit: [http://localhost:3000](http://localhost:3000)
 | Real terminal with `node-pty`   | 🔜 Planned |
 | FS-based execution environments | 🔜 Planned |
 | Code download as ZIP            | 🔜 Planned |
-| Session-based Excalidraw sync   | ✅ Done     |
-| Terminal-like UI for output     | ✅ Done     |
+| Session-based Excalidraw sync   | 🔜 Working |
+| Terminal-like UI for output     | ✅ Done    |
 
 **Plan:** Each room will spawn a separate Docker container (in production), which will:
 
