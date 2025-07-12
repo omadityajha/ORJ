@@ -65,7 +65,7 @@ The folder structure is generated from the above schema using a utility function
 
 ## 🧷 Code Execution via Judge0
 
-Users can run code files directly inside the app using a **run button**. Output appears in a terminal-like component powered by `xterm.js`.
+Users can run code files directly inside the app using a **run button**. Output appears in a terminal-like component.
 
 ### Supported Languages
 
