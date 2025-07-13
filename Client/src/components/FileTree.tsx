@@ -9,7 +9,9 @@ import {
   Edit3,
   Trash2
 } from 'lucide-react';
-import { getFileTypeInfo, type FileTypeInfo, type FileNode,buildFileTree } from '../lib/utility';
+import { getFileTypeInfo, type FileTypeInfo, type FileNode,
+  // buildFileTree
+ } from '../lib/utility';
 import { useFileTree } from "../context/FileTreeContext";
 import { useSocket } from "../context/SocketProvider";
 import { useParams } from 'react-router-dom';
