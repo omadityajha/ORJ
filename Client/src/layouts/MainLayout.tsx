@@ -2,6 +2,7 @@ import { Outlet, Link, useNavigate } from 'react-router-dom';
 import { useUser } from '../context/UserContext';
 import { useTheme } from '../context/ThemeContext';
 import ThemeToggle from '../components/auth/ThemeToggle';
+import { useState } from 'react';
 
 const MainLayout = () => {
   const { logout, user } = useUser();
@@ -12,6 +13,10 @@ const MainLayout = () => {
     logout();
     navigate('/login');
   };
+
+  const [backendOnline,setBackendOnline]= useState(false);
+
+  
 
   return (
     <div className={`min-h-screen flex flex-col transition-all duration-300 ${

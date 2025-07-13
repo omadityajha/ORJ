@@ -15,6 +15,10 @@ const io = new SocketServer(server, { cors: { origin:  process.env.CLIENT_URL} }
 app.use(cors());
 app.use(express.json());
 
+app.get('/ping', (req, res) => {
+  res.status(200).send('pong');
+});
+
 // Connect DB
 await connectDB();
 
