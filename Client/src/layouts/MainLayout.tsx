@@ -2,7 +2,8 @@ import { Outlet, Link, useNavigate } from 'react-router-dom';
 import { useUser } from '../context/UserContext';
 import { useTheme } from '../context/ThemeContext';
 import ThemeToggle from '../components/auth/ThemeToggle';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
+import ErrorAlert from "../components/auth/ErrorAlert";
 
 const MainLayout = () => {
   const { logout, user } = useUser();
@@ -15,8 +16,23 @@ const MainLayout = () => {
   };
 
   const [backendOnline,setBackendOnline]= useState(false);
-
   
+  useEffect(() => {
+    const checkBackend = () => {
+      fetch(`${import.meta.env.VITE_SERVER_URL}/ping`)
+        .then(() => setBackendOnline(true))
+        .catch(() => setBackendOnline(false));
+    };
+
+    // Check immediately on mount
+    checkBackend();
+
+    // Then keep checking every 5 seconds
+    const interval = setInterval(checkBackend, 5000);
+
+    return () => clearInterval(interval); // cleanup on unmount
+  }, []);
+
 
   return (
     <div className={`min-h-screen flex flex-col transition-all duration-300 ${
@@ -58,6 +74,8 @@ const MainLayout = () => {
           </div>
         </div>
       </header>
+
+      {!backendOnline && <ErrorAlert message={`Waiting for backend ${import.meta.env.VITE_SERVER_URL} to Connect`}/>}
 
       {/* Main content */}
       <main className="flex-grow w-full">
