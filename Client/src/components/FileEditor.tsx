@@ -22,7 +22,7 @@ const FileEditor: React.FC = () => {
   const [isDraggingTerminal, setIsDraggingTerminal] = useState(false);
   const [showSidebar, setShowSidebar] = useState(true);
   const [showTerminal, setShowTerminal] = useState(false);
-  const [collaborators, setCollaborators] = useState<any[]>([]);
+  // const [collaborators, setCollaborators] = useState<any[]>([]);
   const [output, setOutput] = useState<string | null>(null);
   const [isEditorReady, setIsEditorReady] = useState(false);
 
@@ -30,7 +30,9 @@ const FileEditor: React.FC = () => {
   const containerRef = useRef<HTMLDivElement>(null);
 
   // Initialize Yjs for selected file - only when editor is ready
-  const { ydoc, binding } = useYjsEditor(
+  const { ydoc, 
+    // binding
+   } = useYjsEditor(
     roomId,
     selectedFile?.path,
     isEditorReady ? editorRef.current : null
@@ -156,7 +158,9 @@ const FileEditor: React.FC = () => {
     }
   }, [selectedFile, isEditorReady, updateEditorLayout]);
 
-  const handleEditorMount: OnMount = (editor, monacoInstance) => {
+  const handleEditorMount: OnMount = (editor, 
+    // monacoInstance
+  ) => {
     editorRef.current = editor;
     
     // Comprehensive editor initialization

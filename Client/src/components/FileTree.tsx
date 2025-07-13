@@ -348,25 +348,25 @@ const FileTree: React.FC<FileTreeProps> = ({ onFileSelect }) => {
   }, [fileTree]);
 
   // Expose buildFileTree function to parent component
-  useEffect(() => {
-    // Update the FileTree context or parent with the buildFileTree function
-    // that preserves open state
-    if (typeof setFileTree === 'function') {
-      const originalSetFileTree = setFileTree;
-      const enhancedSetFileTree = (treeOrUpdater: any) => {
-        if (typeof treeOrUpdater === 'function') {
-          originalSetFileTree(treeOrUpdater);
-        } else {
-          // If it's raw data from server, build it with preserved state
-          const builtTree = buildFileTree(treeOrUpdater, openStateRef.current);
-          originalSetFileTree(builtTree);
-        }
-      };
+  // useEffect(() => {
+  //   // Update the FileTree context or parent with the buildFileTree function
+  //   // that preserves open state
+  //   if (typeof setFileTree === 'function') {
+  //     const originalSetFileTree = setFileTree;
+  //     const enhancedSetFileTree = (treeOrUpdater: any) => {
+  //       if (typeof treeOrUpdater === 'function') {
+  //         originalSetFileTree(treeOrUpdater);
+  //       } else {
+  //         // If it's raw data from server, build it with preserved state
+  //         const builtTree = buildFileTree(treeOrUpdater, openStateRef.current);
+  //         originalSetFileTree(builtTree);
+  //       }
+  //     };
       
-      // You might want to expose this enhanced function to parent
-      // For now, we'll keep the original logic
-    }
-  }, [setFileTree]);
+  //     // You might want to expose this enhanced function to parent
+  //     // For now, we'll keep the original logic
+  //   }
+  // }, [setFileTree]);
 
   const handleSelect = (node: FileNode) => {
     setSelectedId(node.id);
@@ -397,6 +397,9 @@ const FileTree: React.FC<FileTreeProps> = ({ onFileSelect }) => {
   const handleContextMenu = (e: React.MouseEvent, node: FileNode) => {
     e.preventDefault();
     e.stopPropagation();
+    if(node){
+      //donothing ts fix
+    }
   };
 
   const handleAdd = (isFolder: boolean) => {
