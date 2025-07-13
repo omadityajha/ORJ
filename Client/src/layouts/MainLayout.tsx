@@ -44,13 +44,13 @@ const MainLayout = () => {
       }`}>
         <div className="px-4 sm:px-6 lg:px-8 w-full">
           <div className="flex justify-between h-16 items-center">
-            <div className="flex-shrink-0 flex items-center gap-3">
-              <img src="/Logo.png" alt="ORJIN Logo" className="w-12 h-12 rounded-full" />
+            <div className="flex-shrink-0 w-2/6 flex items-center md:gap-3">
+              <img src="/Logo.png" alt="ORJIN Logo" className="w-1/6 h-12 rounded-full" />
               <span className={`text-2xl font-bold ${
                 theme === 'dark' ? 'text-primary-400' : 'text-primary-600'
               }`}>ORJIN</span>
             </div>
-            <nav className="flex items-center space-x-8">
+            <nav className="flex items-center md:space-x-8">
               <Link to="/" className={`hover:text-primary-400 px-3 py-2 rounded-md text-sm font-medium transition ${
                 theme === 'dark' ? 'text-gray-300' : 'text-gray-700'
               }`}>

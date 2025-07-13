@@ -25,8 +25,8 @@ const DashboardHeader: React.FC<{
     setFileTree([]);
   },[])
   return (
-    <div className="flex items-center justify-between gap-4 px-4 pt-6 md:px-8 animate-fade-in w-full">
-      <div className="flex items-center gap-2">
+    <div className="grid grid-cols-1 max-sm:space-y-5 sm:grid-cols-2 items-center justify-between gap-4 px-4 pt-6 md:px-8 animate-fade-in w-full">
+      <div className="flex items-center gap-2 ">
         {showSidebarToggle && (
           <button
             className={`inline-flex items-center justify-center p-2 rounded-lg shadow-lg focus:outline-none transition ${
@@ -118,7 +118,7 @@ const Dashboard: React.FC = () => {
         {dummyRooms.map((room, idx) => (
               <div
                 key={room.id}
-                className={`backdrop-blur-lg border shadow-xl rounded-2xl p-8 flex flex-col gap-4 transition-transform duration-300 hover:scale-105 hover:shadow-2xl hover:-translate-y-1 animate-fade-in group cursor-pointer ${
+                className={`backdrop-blur-lg max-w-[98%] border shadow-xl rounded-2xl p-8 flex flex-col gap-4 transition-transform duration-300 hover:scale-105 hover:shadow-2xl hover:-translate-y-1 animate-fade-in group cursor-pointer ${
                   theme === 'dark'
                     ? 'bg-white/10 border-white/20'
                     : 'bg-white/60 border-gray-200'
