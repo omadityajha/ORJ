@@ -1,21 +1,20 @@
-# 📁 RealTime Collaborative App (Code Editor + Canvas + Terminal + Live Preview)
+# 📁 RealTime Collaborative App
 
-A **real-time collaborative platform** for developers and teams to work together inside shared rooms (folder-based workspaces). Includes live file editing, a whiteboard (Excalidraw), terminal execution, and preview – all synced live via CRDTs.
+A **real-time collaborative platform** for developers and teams to code, draw, and preview together inside shared rooms (folder-based workspaces). Features live file editing, collaborative whiteboard, terminal-style code execution using Judge0, and real-time synchronization powered by CRDTs.
 
 ---
 
 ## 🚀 Features
 
-✅ **Folder-based workspaces**
-🦰 **Monaco Editor** for code with language support
-🎨 **Excalidraw Whiteboard** for sketching ideas
-📱 **Real-time collaboration** using Yjs + Socket.IO
-👭 **Live presence & cursor sharing**
-🔐 **JWT-based authentication** with role control
-🔦 **Terminal Integration** (run files based on extension)
-📅 **Persistent folder/file structure using local FS**
-📊 **Live FS sync with chokidar**
-🌟 **Electron-compatible**
+✅ Folder-based workspaces (MongoDB-powered)
+🧐 **Monaco Editor** with syntax highlighting
+🎨 **Excalidraw Canvas** for collaborative sketching
+🧠 **Real-time collaboration** via Yjs + Socket.IO
+🧝 **Live presence & cursor sharing**
+🔒 **JWT authentication** with user role support
+🖥️ **Judge0 integration** to execute code in terminal-like UI
+🗖 **Persistent file structure** (stored in MongoDB)
+🧪 **Future**: Docker-per-room containerized terminals
 
 ---
 
@@ -26,172 +25,141 @@ A **real-time collaborative platform** for developers and teams to work together
 * React + TypeScript
 * TailwindCSS
 * Monaco Editor
-* Excalidraw (Canvas whiteboard)
-* Yjs (with Awareness API)
-* Socket.IO-client
+* Excalidraw
+* Yjs (with Awareness)
+* Socket.IO Client
+* Judge0 (API-based code execution)
 
 ### Backend
 
 * Node.js + Express
 * Socket.IO
-* node-pty (cross-platform terminal support)
-* chokidar (FS watching)
-* chardet (encoding detection)
-* MongoDB (file tree persistence - planned)
+* MongoDB (Mongoose)
+* Yjs (CRDT backend)
+* Judge0 (via RapidAPI or self-hosted)
 
 ---
 
-## ⚙️ How It Works
-
-```
-🧑 User (Browser)
-   │
- └️️️️️️️️️️️️️️┐
- ▼              ▼
-Monaco        Excalidraw
-Editor        Canvas
-   │              │
-   └️Yjs CRDT Doc┘
-         │
-     Awareness + Sync
-         │
-    Socket.IO Provider
-         │
- └️️️️️️️️️️️️️️┐
- ▼                ▼
-File System    Terminal (pty)
-     │               │
-     ▼               ▼
-Backend FS     Real Shell Process
-```
-
----
-
-## 💻 Folder & File Schema (MongoDB - planned)
+## 💃 File Schema (MongoDB)
 
 ```ts
 {
   _id: ObjectId,
-  roomId: 'team123',
-  name: 'index.js',
+  roomId: string,         // e.g., "team123"
+  name: string,           // e.g., "main.py"
+  path: string,           // e.g., "src/main.py"
   type: 'file' | 'folder',
-  parent: 'src/',
-  content: '...code...',
-  createdBy: 'userId123'
+  parent: string | null,  // e.g., "src"
+  content: string,        // Only for files
+  createdAt, updatedAt
 }
 ```
 
 ---
 
-## 📂 Folder Tree from Backend (`GET /files`)
+## 📆 Folder Tree (Client-Side)
 
-* Dynamically generated from the `./user` folder
-* Files/folders emit live updates via `chokidar`
-* Synced with frontend automatically
+The folder structure is generated from the above schema using a utility function (`buildFileTree`). The frontend maintains folder toggling, tree view, and syncing via socket events.
 
 ---
 
-## 💡 Run File via Terminal
+## 🧷 Code Execution via Judge0
 
-A run button is available per file. When clicked, a mapped command is executed via `node-pty`.
+Users can run code files directly inside the app using a **run button**. Output appears in a terminal-like component.
 
-### Supported Extensions & Commands:
+### Supported Languages
 
-| Extension | Command                            |
-| --------- | ---------------------------------- |
-| `.js`     | `node file.js`                     |
-| `.ts`     | `ts-node file.ts`                  |
-| `.py`     | `python file.py`                   |
-| `.sh`     | `bash script.sh`                   |
-| `.c`      | `gcc file.c -o out && ./out`       |
-| `.cpp`    | `g++ file.cpp -o out && ./out`     |
-| `.java`   | `javac file.java && java FileName` |
-| `.go`     | `go run file.go`                   |
-| `.rb`     | `ruby file.rb`                     |
-| `.php`    | `php file.php`                     |
-| `.rs`     | `rustc file.rs && ./file`          |
+| Extension | Language             |
+| --------- | -------------------- |
+| `.js`     | JavaScript (Node.js) |
+| `.py`     | Python 3             |
+| `.ts`     | TypeScript           |
+| `.cpp`    | C++                  |
+| `.c`      | C                    |
+| `.java`   | Java                 |
+| `.go`     | Go                   |
+| `.rb`     | Ruby                 |
+| `.rs`     | Rust                 |
 
----
-
-## 🔌 node-pty Installation
-
-### 🛠️ Windows
-
-```bash
-npm install --save node-pty
-```
-
-Ensure:
-
-```bash
-npm install --global windows-build-tools
-```
-
-### 🐙 Linux / 📕 macOS
-
-```bash
-sudo apt install -y make g++ python3
-npm install --save node-pty
-```
-
-> Node.js 20+ required
-> On Linux/macOS, ensure `make`, `g++`, and `python3` are available
+*Execution handled via Judge0 REST API*
 
 ---
 
-## 💦 Setup & Run
+## 📊 Real-time Sync via Yjs
 
-### 1️⃣ Clone the Repository
+* Yjs CRDTs sync content of files using collaborative data structures
+* Each file has its own Yjs document (`Y.Doc`)
+* Updates are synced in real-time using `Socket.IO`
+* Changes are periodically saved to MongoDB
+
+---
+
+## ⚙️ Project Setup
+
+### 1️⃣ Clone the repo
 
 ```bash
 git clone https://github.com/omadityajha/ORJ.git
 cd ORJ
 ```
 
-### 2️⃣ Install Dependencies
-
-```bash
-# Frontend
-cd client
-npm install
-
-# Backend
-cd ../server
-npm install
-```
-
-### 3️⃣ Start the Development Servers
+### 2️⃣ Install dependencies
 
 ```bash
 # Backend
 cd server
-node index.js
+npm install
 
 # Frontend
 cd ../client
-npm run dev  # or npm start
+npm install
 ```
 
-Visit: `http://localhost:3000`
+### 3️⃣ Environment variables
+
+Add `.env` file in `server/` and `client/` with appropriate MongoDB URI and Judge0 API keys.
+
+### 4️⃣ Start development servers
+
+```bash
+# Start backend
+cd server
+npm run dev
+
+# Start frontend
+cd ../client
+npm run dev
+```
+
+Visit: [http://localhost:3000](http://localhost:3000)
 
 ---
 
-## ⚠️ In Progress
+## 📆 Future Plans
 
-* ❌ **Download as ZIP** (Not yet added)
-* ✅ **Excalidraw canvas replacing Fabric.js**
-* ✅ Folder-specific file creation, terminal execution
-* ✅ Fixes for new-file behavior and folder toggling
+| Feature                         | Status     |
+| ------------------------------- | ---------- |
+| Docker-per-room terminals       | 🔜 Planned |
+| Real terminal with `node-pty`   | 🔜 Planned |
+| FS-based execution environments | 🔜 Planned |
+| Code download as ZIP            | 🔜 Planned |
+| Session-based Excalidraw sync   | 🔜 Working |
+| Terminal-like UI for output     | ✅ Done    |
+
+**Plan:** Each room will spawn a separate Docker container (in production), which will:
+
+* Run `node-pty` shell for isolated terminal access
+* Sync with frontend `xterm.js`
+* Allow truly interactive sessions for file execution
 
 ---
 
-## 🤝 Contributing
+## 🧑‍💻 Contributing
 
-All feedback, issues, and PRs are welcome!
-Fork the repo, make your change, and submit a pull request.
+Pull requests, issues, and feedback welcome!
 
 ---
 
-## 📄 License
+## 📜 License
 
 MIT © 2025 – Team TechSena
