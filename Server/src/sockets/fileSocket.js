@@ -34,6 +34,7 @@ export default function fileSocketHandler(io) {
       
       socket.join(roomId);
       console.log(`Socket ${socket.id} joined room ${roomId}`);
+      io.to(roomId).emit("file:refresh");
       socket.emit("room:joined", { roomId });
     });
 
