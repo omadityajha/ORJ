@@ -23,7 +23,7 @@ const server = http.createServer(app);
 // ✅ Pass matching CORS config to Socket.IO
 const io = new SocketServer(server, {
   cors: {
-    origin: process.env.CLIENT_URL,
+    origin: '*',
     methods: ['GET', 'POST'],
     credentials: true,
   },
