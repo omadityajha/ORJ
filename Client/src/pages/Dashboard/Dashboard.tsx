@@ -1,10 +1,11 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import Sidebar from '@components/Sidebar';
 import RoomCard from '@components/RoomCard';
 import { Menu } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { useRoom } from '@context/RoomContext';
 import { useTheme } from '@context/ThemeContext';
+import { useFileTree } from '@context/FileTreeContext';
 
 const dummyRooms = [
   { id: 1, name: 'Frontend Devs', users: 5 },
@@ -19,7 +20,10 @@ const DashboardHeader: React.FC<{
   showSidebarToggle: boolean;
 }> = ({ onCreateRoom, onJoinRoom, onSidebarToggle, showSidebarToggle }) => {
   const { theme } = useTheme();
-  
+  const {setFileTree} = useFileTree();
+  useEffect(()=>{
+    setFileTree([]);
+  },[])
   return (
     <div className="flex items-center justify-between gap-4 px-4 pt-6 md:px-8 animate-fade-in w-full">
       <div className="flex items-center gap-2">

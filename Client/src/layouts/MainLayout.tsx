@@ -56,11 +56,12 @@ const MainLayout = () => {
               }`}>
                 Dashboard
               </Link>
-              <Link to="/room/2" className={`hover:text-primary-400 px-3 py-2 rounded-md text-sm font-medium transition ${
+              {/* Previous Room coming soon */}
+              {/* <Link to="/room/2" className={`hover:text-primary-400 px-3 py-2 rounded-md text-sm font-medium transition ${
                 theme === 'dark' ? 'text-gray-300' : 'text-gray-700'
               }`}>
                 Room
-              </Link>
+              </Link> */}
               <ThemeToggle />
               <button 
                 onClick={handleLogout}
