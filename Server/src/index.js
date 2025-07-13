@@ -4,27 +4,44 @@ import http from 'http';
 import cors from 'cors';
 import { Server as SocketServer } from 'socket.io';
 import fileSocketHandler from './sockets/fileSocket.js';
-import {connectDB} from './utils/db.js';
+import { connectDB } from './utils/db.js';
 import dotenv from "dotenv";
 dotenv.config();
 
 const app = express();
-const server = http.createServer(app);
-const io = new SocketServer(server, { cors: { origin:  process.env.CLIENT_URL} });
 
-app.use(cors());
+// ✅ Setup CORS with correct origin
+app.use(cors({
+  origin: process.env.CLIENT_URL,
+  credentials: true,
+}));
+
 app.use(express.json());
 
+const server = http.createServer(app);
+
+// ✅ Pass matching CORS config to Socket.IO
+const io = new SocketServer(server, {
+  cors: {
+    origin: process.env.CLIENT_URL,
+    methods: ['GET', 'POST'],
+    credentials: true,
+  },
+});
+
+// ✅ Health check
 app.get('/ping', (req, res) => {
   res.status(200).send('pong');
 });
 
-// Connect DB
+// ✅ Connect MongoDB
 await connectDB();
 
-// Socket setup
+// ✅ Attach Socket.IO handlers
 fileSocketHandler(io);
 
-server.listen(9000, () => {
-  console.log("🚀 Server running on port 9000");
+// ✅ Listen on PORT
+const PORT = process.env.PORT || 9000;
+server.listen(PORT, () => {
+  console.log(`🚀 Server running on port ${PORT}`);
 });
