@@ -1,7 +1,6 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { type FileNode } from '../lib/utility'; // your FileNode type
 
-// Context type
 interface FileTreeContextType {
   fileTree: FileNode[];
   setFileTree: React.Dispatch<React.SetStateAction<FileNode[]>>;
@@ -9,10 +8,8 @@ interface FileTreeContextType {
   setSelectedFile: (file: FileNode | null) => void;
 }
 
-// Create context
 const FileTreeContext = createContext<FileTreeContextType | undefined>(undefined);
 
-// Provider component
 export const FileTreeProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [fileTree, setFileTree] = useState<FileNode[]>([]);
   const [selectedFile, setSelectedFile] = useState<FileNode | null>(null);

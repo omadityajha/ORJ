@@ -16,7 +16,7 @@ export const SocketProvider = ({ children, roomId }: { children: React.ReactNode
   const [socket, setSocket] = useState<Socket | null>(null);
 
   useEffect(() => {
-    const newSocket = io('http://localhost:9000', {
+    const newSocket = io(import.meta.env.VITE_SERVER_URL, {
       query: { roomId },
       transports: ['websocket'],
     });
